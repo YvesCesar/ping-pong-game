@@ -6,7 +6,7 @@ public class App {
 
 	public static void main(String[] args) {
 		
-		int a;
+		//int a;
 		
 		Scenario scenario = new Scenario();
 		scenario.config();
