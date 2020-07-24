@@ -11,6 +11,7 @@ public class Scenario extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1L;
 	
 	JLabel player1;
+	JLabel ball;
 	int movementSpeed = 15;
 	
 	public void config() {
@@ -25,8 +26,6 @@ public class Scenario extends JFrame implements KeyListener {
 		
 		init();
 		setVisible(true); //Deixa a janela visível(Por último, garantindo a visibilidade)
-		
-		addKeyListener( this );
 	}
 	
 	public void init() {
@@ -36,6 +35,16 @@ public class Scenario extends JFrame implements KeyListener {
 		player1.setBackground(Color.BLACK);
 		player1.setOpaque(true);
 		add(player1);
+		
+		ball = new JLabel();
+		ball.setSize(25, 25);
+		ball.setOpaque(true);
+		ball.setBackground(Color.RED);
+		ball.setLocation(200, 400);
+		add(ball);
+		
+		ballMovement();
+		addKeyListener( this );
 	}
 	
 	
@@ -65,7 +74,42 @@ public class Scenario extends JFrame implements KeyListener {
 			}
 		}
 	}
-
+	
+	boolean right = true;
+	public void ballMovement() {
+		int ballSpeed = 5;
+		
+		new Thread( new Runnable() {
+			
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						Thread.sleep(25);
+					}
+					catch ( Exception e ) {
+						System.out.println("Error when moving the ball.");
+					}
+					if ( (ball.getX() + ball.getWidth()) > getWidth() ) {
+						right = false;
+					}
+					if ( ball.getX() < 0 ) {
+						right = true;
+					}
+					if ( right ) {
+						ball.setLocation(ball.getX() + ballSpeed, ball.getY());
+					}
+					else {
+						ball.setLocation(ball.getX() - ballSpeed, ball.getY());
+					}
+					
+				}
+				
+			}
+		}).start();
+		
+	}
+	
 	@Override
 	public void keyReleased(KeyEvent arg0) {}
 
