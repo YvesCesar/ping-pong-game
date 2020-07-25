@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 public class Scenario extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1L;
@@ -43,6 +44,7 @@ public class Scenario extends JFrame implements KeyListener {
 		ball.setLocation(200, 400);
 		add(ball);
 		
+		collision();
 		ballMovement();
 		addKeyListener( this );
 	}
@@ -74,8 +76,45 @@ public class Scenario extends JFrame implements KeyListener {
 			}
 		}
 	}
-	
+
 	boolean right = true;
+	public void collision() {
+		
+		new Thread( new Runnable() {
+			
+			@Override
+			public void run() {
+				while( true ) {
+					pause(25);
+					
+					if ( player1.getX() + player1.getWidth() > ball.getX() ) {
+						
+						//Variáveis de apoio:
+						int a = player1.getY();
+						int b = player1.getY() + player1.getHeight();
+						int c = ball.getY();
+						int d = ball.getY() + ball.getHeight();
+						
+						if ( a <= c && d <= b ) {
+							right = !(right);
+						}
+					}
+				}
+			}
+			
+		}).start();
+		
+	}
+	
+	private void pause( long time ) {
+		try {
+			Thread.sleep(time);
+		}
+		catch ( Exception e ) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+	
 	public void ballMovement() {
 		int ballSpeed = 5;
 		
@@ -84,12 +123,8 @@ public class Scenario extends JFrame implements KeyListener {
 			@Override
 			public void run() {
 				while(true) {
-					try {
-						Thread.sleep(25);
-					}
-					catch ( Exception e ) {
-						System.out.println("Error when moving the ball.");
-					}
+					
+					pause(25);
 					if ( (ball.getX() + ball.getWidth()) > getWidth() ) {
 						right = false;
 					}
