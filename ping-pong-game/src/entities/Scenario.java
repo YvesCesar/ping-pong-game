@@ -78,6 +78,29 @@ public class Scenario extends JFrame implements KeyListener {
 	}
 
 	boolean right = true;
+	
+	public boolean isCollided( JLabel obj1, JLabel obj2 ) {
+		//Variáveis de apoio:
+		int a = obj1.getX();
+		int b = obj1.getX() + obj1.getWidth();
+		int c = obj2.getX();
+		int d = obj2.getX() + obj2.getWidth();
+		
+		if ( b >= c && d >= a ) {
+			
+			//Variáveis de apoio:
+			int yP = obj1.getY();
+			int yLP = obj1.getY() + obj1.getHeight();
+			int yQ = obj2.getY();
+			int yLQ = obj2.getY() + obj2.getHeight();
+			
+			if ( yP <= yQ && yLQ <= yLP ) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void collision() {
 		
 		new Thread( new Runnable() {
@@ -87,17 +110,10 @@ public class Scenario extends JFrame implements KeyListener {
 				while( true ) {
 					pause(25);
 					
-					if ( player1.getX() + player1.getWidth() > ball.getX() ) {
+					if ( isCollided( player1, ball ) ) {
 						
-						//Variáveis de apoio:
-						int a = player1.getY();
-						int b = player1.getY() + player1.getHeight();
-						int c = ball.getY();
-						int d = ball.getY() + ball.getHeight();
+						right = !right;
 						
-						if ( a <= c && d <= b ) {
-							right = !(right);
-						}
 					}
 				}
 			}
