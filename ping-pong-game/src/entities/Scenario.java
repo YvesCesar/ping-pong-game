@@ -3,17 +3,20 @@ package entities;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 public class Scenario extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1L;
 	
 	JLabel player1;
 	JLabel ball;
-	int movementSpeed = 15;
+	int movementSpeed = 20;
+	int direction = 0;
+	int weightY = 0;
+	int ballSpeed = 1;
 	
 	public void config() {
 		setSize(1024, 700); // Tamanho
@@ -113,6 +116,7 @@ public class Scenario extends JFrame implements KeyListener {
 					if ( isCollided( player1, ball ) ) {
 						
 						right = !right;
+						changeRandomDirection();
 						
 					}
 				}
@@ -131,8 +135,18 @@ public class Scenario extends JFrame implements KeyListener {
 		}
 	}
 	
+	private void changeRandomDirection() {
+		
+		Random random = new Random();
+		int n = random.nextInt( 3 ); 
+		
+		n -= 1;
+		direction = n;
+		
+		//ballSpeed = random.nextInt(25) + 5;
+	}
+	
 	public void ballMovement() {
-		int ballSpeed = 5;
 		
 		new Thread( new Runnable() {
 			
@@ -140,18 +154,36 @@ public class Scenario extends JFrame implements KeyListener {
 			public void run() {
 				while(true) {
 					
-					pause(25);
+					pause(2);
 					if ( (ball.getX() + ball.getWidth()) > getWidth() ) {
 						right = false;
 					}
 					if ( ball.getX() < 0 ) {
 						right = true;
 					}
-					if ( right ) {
-						ball.setLocation(ball.getX() + ballSpeed, ball.getY());
+					if ( ball.getY() <= 0 ) {
+						direction = -1;
+					}
+					if ( ball.getY() + ball.getHeight()+25 >= getHeight() ) {
+						direction = 1;
+					}
+					
+					
+					if ( direction == 0 ) {
+						weightY = 0;
+					}
+					else if ( direction == 1 ) {
+						weightY = ballSpeed * -1;
 					}
 					else {
-						ball.setLocation(ball.getX() - ballSpeed, ball.getY());
+						weightY = ballSpeed;
+					}
+					
+					if ( right ) {
+						ball.setLocation(ball.getX() + ballSpeed, ball.getY() + weightY);
+					}
+					else {
+						ball.setLocation(ball.getX() - ballSpeed, ball.getY() + weightY);
 					}
 					
 				}
