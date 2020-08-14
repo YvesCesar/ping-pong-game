@@ -1,22 +1,31 @@
 package entities;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Random;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
 
 public class Scenario extends JFrame implements KeyListener {
 	private static final long serialVersionUID = 1L;
 	
 	JLabel player1;
+	JLabel player2;
 	JLabel ball;
+	JLabel scores;
 	int movementSpeed = 20;
 	int direction = 0;
 	int weightY = 0;
 	int ballSpeed = 1;
+	int pointsPlayer1 = 0;
+	int pointsPlayer2 = 0;
 	
 	public void config() {
 		setSize(1024, 700); // Tamanho
@@ -40,16 +49,33 @@ public class Scenario extends JFrame implements KeyListener {
 		player1.setOpaque(true);
 		add(player1);
 		
+		player2 = new JLabel();
+		player2.setSize(40, 200);
+		player2.setLocation(getWidth() - 103, 230);
+		player2.setBackground(Color.BLUE);
+		player2.setOpaque(true);
+		add(player2);
+		
 		ball = new JLabel();
 		ball.setSize(25, 25);
-		ball.setOpaque(true);
-		ball.setBackground(Color.RED);
 		ball.setLocation(200, 400);
+		Image img = new ImageIcon("ball.png").getImage().getScaledInstance(
+				ball.getWidth(), ball.getHeight(), Image.SCALE_FAST);
+		ball.setIcon( new ImageIcon(img) );
 		add(ball);
+		
+		scores = new JLabel();
+		scores.setBounds(0, 20, getWidth(), 50);
+		scores.setText("0 X 0");
+		scores.setFont( new Font("Century Gothic", 0, 50) );
+		scores.setHorizontalAlignment(SwingConstants.CENTER);
+		add(scores);
 		
 		collision();
 		ballMovement();
 		addKeyListener( this );
+		
+		initBall();
 	}
 	
 	
@@ -113,7 +139,8 @@ public class Scenario extends JFrame implements KeyListener {
 				while( true ) {
 					pause(25);
 					
-					if ( isCollided( player1, ball ) ) {
+					if ( isCollided( player1, ball )
+						 || isCollided( player2, ball ) ) {
 						
 						right = !right;
 						changeRandomDirection();
@@ -146,6 +173,19 @@ public class Scenario extends JFrame implements KeyListener {
 		//ballSpeed = random.nextInt(25) + 5;
 	}
 	
+	private void initBall() {
+		ball.setLocation(getWidth() / 2, getHeight() / 2 );
+		direction = 0;
+		Random random = new Random();
+		
+		if ( random.nextInt() == 0 ) {
+			right = true;
+		}
+		else {
+			right = false;
+		}
+	}
+	
 	public void ballMovement() {
 		
 		new Thread( new Runnable() {
@@ -156,16 +196,28 @@ public class Scenario extends JFrame implements KeyListener {
 					
 					pause(2);
 					if ( (ball.getX() + ball.getWidth()) > getWidth() ) {
-						right = false;
+						pointsPlayer1++;
+						initBall();
+						scores.setText( pointsPlayer1 + " X " + pointsPlayer2 );
 					}
 					if ( ball.getX() < 0 ) {
-						right = true;
+						pointsPlayer2++;
+						initBall();
+						scores.setText( pointsPlayer1 + " X " + pointsPlayer2 );
 					}
 					if ( ball.getY() <= 0 ) {
 						direction = -1;
 					}
 					if ( ball.getY() + ball.getHeight()+25 >= getHeight() ) {
 						direction = 1;
+					}
+					if ( pointsPlayer1 > 2 ) {
+						JOptionPane.showMessageDialog(null, "Player 1 wins");
+						System.exit(0);
+					}
+					else if ( pointsPlayer2 > 2 ) {
+						JOptionPane.showMessageDialog(null, "Player 2 wins");
+						System.exit(0);
 					}
 					
 					
